@@ -68,7 +68,7 @@ def image_process_convex(image):
     # Print the point cloud(for debug)
     for x in point_cloud_convex:
         sub_img = cv2.circle(sub_img, (x[0],x[1]), radius=0, color=(0, 0, 255), thickness=-1)
-    img_msg = bridge.cv2_to_imgmsg(thresh, encoding="passthrough")
+    img_msg = bridge.cv2_to_imgmsg(sub_img, encoding="passthrough")
     pub_img.publish(img_msg)
 
 # Main
