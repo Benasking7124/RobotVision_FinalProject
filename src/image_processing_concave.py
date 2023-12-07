@@ -52,10 +52,12 @@ def image_process_concave(image):
     # Convert to point cloud
     img_msg = bridge.cv2_to_imgmsg(thresh, encoding="passthrough")
     # rospy.loginfo(len(img_msg.data))
+    point_cloud_concave.clear()
     for i in range(len(img_msg.data)):
         # rospy.loginfo(img_msg.data[i])
         if img_msg.data[i] == 0:
             point_cloud_concave.append([i % img_msg.width, int(i /img_msg.width)])
+    point_cloud_concave_msg.data.clear()
     for i in range(len(point_cloud_concave)):
         array = IntArray()
         array.data = point_cloud_concave[i]
