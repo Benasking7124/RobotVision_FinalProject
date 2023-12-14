@@ -1,0 +1,5 @@
+<launch>
+  <node name="icp" pkg="final_project" type="icp.py" />
+  <node name="image_processing_concave" pkg="final_project" type="image_processing_concave.py" />
+  <node name="image_processing_convex" pkg="final_project" type="image_processing_convex.py" />
+</launch>

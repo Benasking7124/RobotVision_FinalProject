@@ -2,7 +2,7 @@
 
 import rospy
 
-from std_msgs.msg import Bool
+from std_msgs.msg import Int16
 from sensor_msgs.msg import Image
 import numpy as np
 from cv_bridge import CvBridge
@@ -10,20 +10,23 @@ from final_project.msg import Int2DArray, IntArray
 import math
 import cv2
 
-take_pic = True
+take_pic = 1 #0: Do not take pic; 1: Take pic; 2:Taken pic
 point_cloud_concave = []
 point_cloud_concave_msg = Int2DArray()
 bridge = CvBridge()
 pub_pc_concave = rospy.Publisher('point_cloud_concave', Int2DArray, queue_size=10)
 pub_img = rospy.Publisher('processed_image_concave', Image, queue_size=10)
 def take_picture(data):
-    take_pic = data
+    take_pic = data.data
 
 def image_process_concave(image):
     global take_pic
-    if take_pic == False:
+    if take_pic == 0:
         return
-    take_pic = False
+    elif take_pic == 2:
+        pub_pc_concave.publish(point_cloud_concave_msg)
+        return
+    take_pic = 2
 
     #convert to opencv format
     CV2_img = bridge.imgmsg_to_cv2(image, desired_encoding='passthrough')
@@ -81,9 +84,9 @@ def image_process_concave(image):
     pub_img.publish(img_msg)
 
 # Main
-rospy.init_node('image_proccesing_concave', anonymous=False)
+rospy.init_node('image_processing_concave', anonymous=False)
 
-command_concave_sub = rospy.Subscriber('take_picture_concave', Bool, take_picture)
+command_concave_sub = rospy.Subscriber('take_picture_concave', Int16, take_picture)
 image1_concave_sub = rospy.Subscriber('image_concave', Image, image_process_concave)
 
 rospy.spin()
