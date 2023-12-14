@@ -7,7 +7,7 @@ from sensor_msgs.msg import Image
 import numpy as np
 from cv_bridge import CvBridge
 from final_project.msg import Int2DArray, IntArray
-
+import math
 import cv2
 
 take_pic = True
@@ -20,10 +20,11 @@ def take_picture(data):
     take_pic = data
 
 def image_process_concave(image):
-
+    global take_pic
     if take_pic == False:
         return
-    
+    take_pic = False
+
     #convert to opencv format
     CV2_img = bridge.imgmsg_to_cv2(image, desired_encoding='passthrough')
     
@@ -51,19 +52,29 @@ def image_process_concave(image):
 
     # Convert to point cloud
     img_msg = bridge.cv2_to_imgmsg(thresh, encoding="passthrough")
-    # rospy.loginfo(len(img_msg.data))
     point_cloud_concave.clear()
     for i in range(len(img_msg.data)):
-        # rospy.loginfo(img_msg.data[i])
         if img_msg.data[i] == 0:
             point_cloud_concave.append([i % img_msg.width, int(i /img_msg.width)])
+    
+    # Filter out
+    x_mean, y_mean = np.mean(point_cloud_concave, axis=0)
+    remove_list = []
+    for p in point_cloud_concave:
+        if math.sqrt(((p[0] - x_mean) ** 2 + (p[1] - y_mean) ** 2)) > 20:
+            remove_list.append(p)
+    for r in remove_list:
+        point_cloud_concave.remove(r)
+
+    # Convert to ROS message type
     point_cloud_concave_msg.data.clear()
     for i in range(len(point_cloud_concave)):
         array = IntArray()
         array.data = point_cloud_concave[i]
         point_cloud_concave_msg.data.append(array)
     pub_pc_concave.publish(point_cloud_concave_msg)
-    
+    print(len(point_cloud_concave))
+
     # Print the point cloud(for debug)
     for x in point_cloud_concave:
         sub_img = cv2.circle(sub_img, (x[0],x[1]), radius=0, color=(0, 0, 255), thickness=-1)
