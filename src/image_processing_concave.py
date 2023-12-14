@@ -73,7 +73,6 @@ def image_process_concave(image):
         array.data = point_cloud_concave[i]
         point_cloud_concave_msg.data.append(array)
     pub_pc_concave.publish(point_cloud_concave_msg)
-    print(len(point_cloud_concave))
 
     # Print the point cloud(for debug)
     for x in point_cloud_concave:

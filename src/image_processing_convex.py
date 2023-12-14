@@ -73,7 +73,6 @@ def image_process_convex(image):
         array.data = point_cloud_convex[i]
         point_cloud_convex_msg.data.append(array)
     pub_pc_convex.publish(point_cloud_convex_msg)
-    print(len(point_cloud_convex))
     
     # Print the point cloud(for debug)
     for x in point_cloud_convex:
